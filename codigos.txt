@@ -1,0 +1,114 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+
+class RegistroScreen extends StatefulWidget {
+  const RegistroScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegistroScreen> createState() => _RegistroScreenState();
+}
+
+class _RegistroScreenState extends State<RegistroScreen> {
+  final _ganhoController = MoneyMaskedTextController(leftSymbol: 'R\$ ', decimalSeparator: ',', thousandSeparator: '.');
+  final _gastoController = MoneyMaskedTextController(leftSymbol: 'R\$ ', decimalSeparator: ',', thousandSeparator: '.');
+
+  String _origemGanho = 'salario';
+  String _origemGasto = 'compras';
+
+  final _descricaoGanhoController = TextEditingController();
+  final _descricaoGastoController = TextEditingController();
+
+  void _registrarGanho() {
+    print('Ganho registrado: $_origemGanho - ${_ganhoController.text} - ${_descricaoGanhoController.text}');
+    // Aqui você pode chamar seu método de inserção no banco SQLite
+  }
+
+  void _registrarGasto() {
+    print('Gasto registrado: $_origemGasto - ${_gastoController.text} - ${_descricaoGastoController.text}');
+    // Aqui você pode chamar seu método de inserção no banco SQLite
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Registro de Ganhos e Gastos"),
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            Scaffold.of(context).openDrawer(); // abrir menu lateral se houver
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Registrar Ganho", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              value: _origemGanho,
+              decoration: const InputDecoration(labelText: 'Origem do ganho'),
+              items: ['salario', 'bico', 'extra', 'outro']
+                  .map((opcao) => DropdownMenuItem(value: opcao, child: Text(opcao)))
+                  .toList(),
+              onChanged: (valor) {
+                setState(() {
+                  _origemGanho = valor!;
+                });
+              },
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _ganhoController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Valor do ganho'),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _descricaoGanhoController,
+              decoration: const InputDecoration(labelText: 'Especifique o ganho (opcional)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _registrarGanho,
+              child: const Text("Salvar ganho"),
+            ),
+            const Divider(height: 40),
+            const Text("Registrar Gasto", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              value: _origemGasto,
+              decoration: const InputDecoration(labelText: 'Motivo do gasto'),
+              items: ['compras', 'dividas', 'emprestou', 'perdido']
+                  .map((opcao) => DropdownMenuItem(value: opcao, child: Text(opcao)))
+                  .toList(),
+              onChanged: (valor) {
+                setState(() {
+                  _origemGasto = valor!;
+                });
+              },
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _gastoController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Valor do gasto'),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _descricaoGastoController,
+              decoration: const InputDecoration(labelText: 'Especifique o gasto (opcional)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _registrarGasto,
+              child: const Text("Salvar gasto"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
