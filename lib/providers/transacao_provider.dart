@@ -7,23 +7,35 @@ class TransacaoProvider extends ChangeNotifier {
   double _totalGanhos = 0.0;
   double _totalGastos = 0.0;
 
-  List<Transacao> get transacoes => _transacoes;
+  List<Transacao> get transacoes => List.unmodifiable(_transacoes);
   double get totalGanhos => _totalGanhos;
   double get totalGastos => _totalGastos;
 
+  Map<String, double> get gastosPorCategoria {
+    final Map<String, double> mapa = {};
+    for (var t in _transacoes.where((t) => t.tipo == 'gasto')) {
+      mapa[t.categoria] = (mapa[t.categoria] ?? 0) + t.valor;
+    }
+    return mapa;
+  }
+
   Future<void> carregarTransacoes() async {
     final dados = await DBHelper.obterTransacoes();
-    _transacoes.clear();
-    _transacoes.addAll(dados);
+    _transacoes
+      ..clear()
+      ..addAll(dados);
     _calcularTotais();
     notifyListeners();
   }
 
   Future<void> adicionarTransacao(Transacao transacao) async {
     await DBHelper.inserirTransacao(transacao);
-    _transacoes.add(transacao);
-    _calcularTotais();
-    notifyListeners();
+    await carregarTransacoes();
+  }
+
+  Future<void> removerTransacao(int id) async {
+    await DBHelper.deletarTransacao(id);
+    await carregarTransacoes();
   }
 
   void _calcularTotais() {

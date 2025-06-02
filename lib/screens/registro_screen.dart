@@ -12,8 +12,10 @@ class RegistroScreen extends StatefulWidget {
 }
 
 class _RegistroScreenState extends State<RegistroScreen> {
-  final _ganhoController = MoneyMaskedTextController(leftSymbol: 'R\$ ', decimalSeparator: ',', thousandSeparator: '.');
-  final _gastoController = MoneyMaskedTextController(leftSymbol: 'R\$ ', decimalSeparator: ',', thousandSeparator: '.');
+  final _ganhoController = MoneyMaskedTextController(
+      leftSymbol: 'R\$ ', decimalSeparator: ',', thousandSeparator: '.');
+  final _gastoController = MoneyMaskedTextController(
+      leftSymbol: 'R\$ ', decimalSeparator: ',', thousandSeparator: '.');
 
   String _origemGanho = 'salario';
   String _origemGasto = 'compras';
@@ -22,23 +24,59 @@ class _RegistroScreenState extends State<RegistroScreen> {
   final _descricaoGastoController = TextEditingController();
 
   void _registrarGanho() {
-  final novaTransacao = Transacao(
-    tipo: 'ganho',
-    categoria: _origemGanho,
-    valor: _ganhoController.numberValue,
-    descricao: _descricaoGanhoController.text,
-    data: DateTime.now(),
-  );
-  Provider.of<TransacaoProvider>(context, listen: false)
-      .adicionarTransacao(novaTransacao);
+    if (_ganhoController.numberValue <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Informe um valor válido para o ganho.')),
+      );
+      return;
+    }
 
-  _ganhoController.updateValue(0.0);
-  _descricaoGanhoController.clear();
-}
+    final novaTransacao = Transacao(
+      tipo: 'ganho',
+      categoria: _origemGanho,
+      valor: _ganhoController.numberValue,
+      descricao: _descricaoGanhoController.text,
+      data: DateTime.now(),
+    );
+
+    Provider.of<TransacaoProvider>(context, listen: false)
+        .adicionarTransacao(novaTransacao);
+
+    // limpar campos
+    _ganhoController.updateValue(0.0);
+    _descricaoGanhoController.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Ganho registrado com sucesso!')),
+    );
+  }
 
   void _registrarGasto() {
-    print('Gasto registrado: $_origemGasto - ${_gastoController.text} - ${_descricaoGastoController.text}');
-    // Banco
+    if (_gastoController.numberValue <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Informe um valor válido para o gasto.')),
+      );
+      return;
+    }
+
+    final novaTransacao = Transacao(
+      tipo: 'gasto',
+      categoria: _origemGasto,
+      valor: _gastoController.numberValue,
+      descricao: _descricaoGastoController.text,
+      data: DateTime.now(),
+    );
+
+    Provider.of<TransacaoProvider>(context, listen: false)
+        .adicionarTransacao(novaTransacao);
+
+    
+    _gastoController.updateValue(0.0);
+    _descricaoGastoController.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Gasto registrado com sucesso!')),
+    );
   }
 
   @override
@@ -116,7 +154,9 @@ class _RegistroScreenState extends State<RegistroScreen> {
             children: [
               Icon(icon, color: Colors.black54),
               const SizedBox(width: 8),
-              Text(titulo, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(titulo,
+                  style:
+                      const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 16),
@@ -124,7 +164,8 @@ class _RegistroScreenState extends State<RegistroScreen> {
             value: dropdownValue,
             decoration: InputDecoration(
               labelText: dropdownLabel,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             ),
             items: dropdownItems
@@ -138,7 +179,8 @@ class _RegistroScreenState extends State<RegistroScreen> {
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               labelText: labelValor,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.attach_money),
             ),
           ),
@@ -147,7 +189,8 @@ class _RegistroScreenState extends State<RegistroScreen> {
             controller: descricaoController,
             decoration: InputDecoration(
               labelText: labelDescricao,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.note_alt_outlined),
             ),
           ),
@@ -160,7 +203,8 @@ class _RegistroScreenState extends State<RegistroScreen> {
               label: const Text("Salvar"),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
           )

@@ -1,6 +1,6 @@
 class Transacao {
   final int? id;
-  final String tipo; // 'ganho' ou 'gasto'
+  final String tipo; 
   final String categoria;
   final double valor;
   final String? descricao;
@@ -31,9 +31,11 @@ class Transacao {
       id: map['id'],
       tipo: map['tipo'],
       categoria: map['categoria'],
-      valor: map['valor'],
+      valor: (map['valor'] is int)
+          ? (map['valor'] as int).toDouble()
+          : (map['valor'] as num).toDouble(),
       descricao: map['descricao'],
-      data: DateTime.parse(map['data']),
+      data: DateTime.tryParse(map['data']) ?? DateTime.now(),
     );
   }
 }

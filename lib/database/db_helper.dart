@@ -6,7 +6,6 @@ class DBHelper {
   static const _nomeBanco = 'gestor.db';
   static const _versaoBanco = 1;
 
-
   static Future<Database> _abrirBanco() async {
     final path = join(await getDatabasesPath(), _nomeBanco);
     return openDatabase(
@@ -27,12 +26,10 @@ class DBHelper {
     );
   }
 
-
   static Future<int> inserirTransacao(Transacao transacao) async {
     final db = await _abrirBanco();
     return db.insert('transacoes', transacao.toMap());
   }
-
 
   static Future<List<Transacao>> obterTransacoes() async {
     final db = await _abrirBanco();
@@ -40,12 +37,10 @@ class DBHelper {
     return maps.map((map) => Transacao.fromMap(map)).toList();
   }
 
-
   static Future<int> deletarTransacao(int id) async {
     final db = await _abrirBanco();
     return db.delete('transacoes', where: 'id = ?', whereArgs: [id]);
   }
-
 
   static Future<int> atualizarTransacao(Transacao transacao) async {
     final db = await _abrirBanco();

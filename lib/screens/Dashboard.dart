@@ -7,13 +7,41 @@ import '../widgets/kpi_card.dart';
 import '../widgets/grafico_pizza.dart';
 import '../widgets/grafico_linha.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _carregarDados();
+  }
+
+  Future<void> _carregarDados() async {
+    final provider = context.read<TransacaoProvider>();
+    await provider.carregarTransacoes();
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<TransacaoProvider>();
     final formatador = NumberFormat.simpleCurrency(locale: 'pt_BR');
+
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     final totalGanhos = provider.totalGanhos;
     final totalGastos = provider.totalGastos;
@@ -53,22 +81,19 @@ class DashboardScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'Distribuição de Gastos',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 16),
-                    SizedBox(
-                      height: 200,
-                      child: GraficoPizza(),
-                    ),
+                    const SizedBox(height: 16),
+                    GraficoPizza(dados: provider.gastosPorCategoria),
                   ],
                 ),
               ),
@@ -95,7 +120,7 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     SizedBox(
-                      height: 200,
+                      height: 220,
                       child: GraficoLinha(),
                     ),
                   ],
